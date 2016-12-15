@@ -1,0 +1,50 @@
+{
+  "name": "crow-metrics-viz",
+  "version": "1.0.0",
+  "description": "express plugin that exports and displays crow metrics",
+  "keywords": [
+    "metrics",
+    "crow"
+  ],
+  "author": "Robey Pointer <robeypointer@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:robey/crow-metrics-viz.git"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf lib",
+    "distclean": "npm run clean && rm -rf node_modules npm-debug.log",
+    "prepublish": "npm run build",
+    "test": "npm run build && mocha -R spec --colors lib/test --timeout 30000"
+  },
+  "dependencies": {
+    "crow-metrics": "^3.0.0",
+    "express": "^4.14.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.0.34",
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.52",
+    "@types/should": "^8.1.30",
+    "@types/supertest": "^2.0.0",
+    "@types/supertest-as-promised": "^2.0.32",
+    "mocha": "^3.0.2",
+    "should": "^11.1.0",
+    "source-map-support": "^0.4.2",
+    "supertest": "^2.0.1",
+    "supertest-as-promised": "^4.0.2",
+    "typescript": "^2.1.4"
+  },
+  "engines": {
+    "node": ">=6.3.0"
+  },
+  "main": "./lib/viz",
+  "types": "./lib/vis.d.ts",
+  "files": [
+    "doc",
+    "lib",
+    "static"
+  ]
+}
