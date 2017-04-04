@@ -20,7 +20,7 @@
     "test": "npm run build && mocha -R spec --colors lib/test --timeout 30000"
   },
   "dependencies": {
-    "crow-metrics": "^3.0.0",
+    "crow-metrics": "^3.2.0",
     "express": "^4.14.0"
   },
   "devDependencies": {

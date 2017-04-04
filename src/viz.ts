@@ -13,12 +13,13 @@ export interface VizOptions extends RingBufferObserverOptions {
  * Create a sub-path on your existing web server for displaying per-server
  * metrics:
  *
- *     import { MetricsRegistry, viz } from "crow-metrics";
+ *     import { MetricsRegistry } from "crow-metrics";
+ *     import { viz } from "crow-metrics-viz";
  *     import express from "express";
  *
  *     const app = express();
  *     const metrics = new MetricsRegistry();
- *     app.use("/viz", viz(express, metrics));
+ *     app.use("/viz", viz(metrics));
  *     app.listen(8080);
  *
  * You can place it at any path you want.
@@ -28,7 +29,7 @@ export function viz(registry: MetricsRegistry, options: VizOptions = {}): expres
   router.use("/", express.static(staticPath));
 
   const ringBuffer = new RingBufferObserver(options);
-  registry.events.map(deltaSnapshots()).subscribe(ringBuffer);
+  registry.events.map(deltaSnapshots()).subscribe(ringBuffer.observer);
 
   router.get("/history.json", (request, response) => {
     const records = ringBuffer.get();
