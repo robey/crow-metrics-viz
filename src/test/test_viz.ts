@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as http from "http";
-import { MetricsRegistry } from "crow-metrics";
+import { Metrics, MetricsRegistry } from "crow-metrics";
 import { viz } from "../viz";
 import * as request from "supertest-as-promised";
 
@@ -8,15 +8,26 @@ import "should";
 import "source-map-support/register";
 
 describe("viz", () => {
+  let r: MetricsRegistry;
+  let m: Metrics;
+
+  beforeEach(() => {
+    r = new MetricsRegistry();
+    m = r.metrics;
+  });
+
+  afterEach(() => {
+    r.stop();
+  });
+
   it("reports current values", () => {
-    const r = new MetricsRegistry();
     const app = express();
     const router = viz(r);
     app.use(router);
 
-    r.setGauge(r.gauge("speed"), 45);
-    r.increment(r.counter("bugs"), 23);
-    r.addDistribution(r.distribution("tears"), 10);
+    m.setGauge(m.gauge("speed"), 45);
+    m.increment(m.counter("bugs"), 23);
+    m.addDistribution(m.distribution("tears"), 10);
     r.publish();
 
     return request(app).get("/current.json").expect(200).then(response => {
@@ -33,19 +44,18 @@ describe("viz", () => {
   });
 
   it("reports history", () => {
-    const r = new MetricsRegistry();
     const app = express();
     const router = viz(r);
     app.use(router);
 
-    r.setGauge(r.gauge("speed"), 45);
-    r.increment(r.counter("bugs"), 23);
-    r.addDistribution(r.distribution("tears"), 10);
+    m.setGauge(m.gauge("speed"), 45);
+    m.increment(m.counter("bugs"), 23);
+    m.addDistribution(m.distribution("tears"), 10);
     r.publish();
 
-    r.increment(r.counter("bugs"), 5);
-    r.increment(r.counter("foo"), 10);
-    r.addDistribution(r.distribution("tears"), 3);
+    m.increment(m.counter("bugs"), 5);
+    m.increment(m.counter("foo"), 10);
+    m.addDistribution(m.distribution("tears"), 3);
     r.publish();
 
     return request(app).get("/history.json").expect(200).then(response => {
@@ -62,14 +72,13 @@ describe("viz", () => {
   });
 
   it("reports debugging info", () => {
-    const r = new MetricsRegistry();
     const app = express();
     const router = viz(r);
     app.use(router);
 
-    r.increment(r.counter("bugs"), 23);
+    m.increment(m.counter("bugs"), 23);
     r.publish();
-    r.increment(r.counter("bugs"), 5);
+    m.increment(m.counter("bugs"), 5);
     r.publish();
 
     return request(app).get("/debug.json").expect(200).then(response => {

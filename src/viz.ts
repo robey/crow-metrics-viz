@@ -1,11 +1,11 @@
 import * as path from "path";
-import { deltaSnapshots, MetricsRegistry, RingBufferObserver, RingBufferObserverOptions } from "crow-metrics";
+import { deltaSnapshots, MetricsRegistry, RingBuffer, RingBufferOptions } from "crow-metrics";
 import * as express from "express";
 
 // find our static folder -> ./lib/crow/viz/viz.js -> ./static
 const staticPath = path.resolve(require.resolve(".."), "../../static");
 
-export interface VizOptions extends RingBufferObserverOptions {
+export interface VizOptions extends RingBufferOptions {
 
 }
 
@@ -28,8 +28,8 @@ export function viz(registry: MetricsRegistry, options: VizOptions = {}): expres
   const router = express.Router();
   router.use("/", express.static(staticPath));
 
-  const ringBuffer = new RingBufferObserver(options);
-  registry.events.map(deltaSnapshots()).subscribe(ringBuffer.observer);
+  const ringBuffer = new RingBuffer(options);
+  registry.events.map(deltaSnapshots()).attach(ringBuffer);
 
   router.get("/history.json", (request, response) => {
     const records = ringBuffer.get();

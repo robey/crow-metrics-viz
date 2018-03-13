@@ -1,6 +1,6 @@
 {
   "name": "crow-metrics-viz",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "express plugin that exports and displays crow metrics",
   "keywords": [
     "metrics",
@@ -20,25 +20,25 @@
     "test": "npm run build && mocha -R spec --colors lib/test --timeout 30000"
   },
   "dependencies": {
-    "crow-metrics": "^3.2.0",
-    "express": "^4.14.0"
+    "crow-metrics": "^4.0.0",
+    "express": "^4.16.3"
   },
   "devDependencies": {
-    "@types/express": "^4.0.34",
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.52",
-    "@types/should": "^8.1.30",
-    "@types/supertest": "^2.0.0",
-    "@types/supertest-as-promised": "^2.0.32",
-    "mocha": "^3.0.2",
-    "should": "^11.1.0",
-    "source-map-support": "^0.4.2",
-    "supertest": "^2.0.1",
+    "@types/express": "^4.11.1",
+    "@types/mocha": "^2.2.48",
+    "@types/node": "^9.4.7",
+    "@types/should": "^13.0.0",
+    "@types/supertest": "^2.0.4",
+    "@types/supertest-as-promised": "^2.0.35",
+    "mocha": "^5.0.4",
+    "should": "^13.2.1",
+    "source-map-support": "^0.5.3",
+    "supertest": "^3.0.0",
     "supertest-as-promised": "^4.0.2",
-    "typescript": "^2.1.4"
+    "typescript": "^2.7.2"
   },
   "engines": {
-    "node": ">=6.3.0"
+    "node": ">=8.5.0"
   },
   "main": "./lib/viz",
   "types": "./lib/vis.d.ts",
