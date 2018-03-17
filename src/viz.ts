@@ -5,9 +5,10 @@ import * as express from "express";
 // find our static folder -> ./lib/crow/viz/viz.js -> ./static
 const staticPath = path.resolve(require.resolve(".."), "../../static");
 
-export interface VizOptions extends RingBufferOptions {
+type HistoryJson = { [key: string]: (number | null)[] };
 
-}
+// no extra options yet.
+export interface VizOptions extends RingBufferOptions {}
 
 /*
  * Create a sub-path on your existing web server for displaying per-server
@@ -32,37 +33,13 @@ export function viz(metrics: Metrics, options: VizOptions = {}): express.Router 
   metrics.events.map(deltaSnapshots()).attach(ringBuffer);
 
   router.get("/history.json", (request, response) => {
-    const records = ringBuffer.get();
-    const nameSet = new Set<string>();
-    records.forEach(record => {
-      for (const name of record.flatten().keys()) nameSet.add(name);
-    });
-    const names = Array.from(nameSet).sort();
-
-    const json: { [key: string]: (number | null)[] } = { "@timestamp": [] };
-    names.forEach(name => json[name] = []);
-
-    records.forEach(record => {
-      const seen = new Set<string>();
-      json["@timestamp"].push(record.timestamp);
-      for (const [ name, value ] of record.flatten()) {
-        seen.add(name);
-        json[name].push(value);
-      }
-      names.forEach(name => {
-        if (!seen.has(name)) json[name].push(null);
-      });
-    });
-
     response.type("json");
-    response.send(json);
+    response.send(getJsonHistory(ringBuffer));
   });
 
   router.get("/debug.json", (request, response) => {
-    const records = ringBuffer.get();
-
     response.type("json");
-    response.send(records.map(record => record.toJson()));
+    response.send(ringBuffer.get().map(s => s.toJson()));
   });
 
   router.get("/current.json", (request, response) => {
@@ -72,6 +49,25 @@ export function viz(metrics: Metrics, options: VizOptions = {}): express.Router 
   });
 
   return router;
+}
+
+function getJsonHistory(ringBuffer: RingBuffer): HistoryJson {
+  const snapshots = ringBuffer.get();
+  const names = Array.from(new Set<string>(flatten(snapshots.map(s => s.flatten().keys())))).sort();
+
+  const rv: HistoryJson = { "@timestamp": [] };
+  for (const name of names) rv[name] = [];
+
+  for (const s of snapshots) {
+    const seen = new Set<string>();
+    rv["@timestamp"].push(s.timestamp);
+    for (const [ name, value ] of s.flatten()) {
+      seen.add(name);
+      rv[name].push(value);
+    }
+    for (const name of names) if (!seen.has(name)) rv[name].push(null);
+  }
+  return rv;
 }
 
 /*
@@ -93,4 +89,8 @@ export function startVizServer(
   const app = express();
   app.use("/", viz(metrics, options));
   app.listen(port);
+}
+
+function* flatten<A>(x: Iterable<A>[]): Iterable<A> {
+  for (const iter of x) for (const item of iter) yield item;
 }
