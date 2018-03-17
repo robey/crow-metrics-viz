@@ -1,5 +1,5 @@
 import * as path from "path";
-import { deltaSnapshots, MetricsRegistry, RingBuffer, RingBufferOptions } from "crow-metrics";
+import { deltaSnapshots, Metrics, RingBuffer, RingBufferOptions } from "crow-metrics";
 import * as express from "express";
 
 // find our static folder -> ./lib/crow/viz/viz.js -> ./static
@@ -13,23 +13,23 @@ export interface VizOptions extends RingBufferOptions {
  * Create a sub-path on your existing web server for displaying per-server
  * metrics:
  *
- *     import { MetricsRegistry } from "crow-metrics";
+ *     import { Metrics } from "crow-metrics";
  *     import { viz } from "crow-metrics-viz";
  *     import express from "express";
  *
  *     const app = express();
- *     const metrics = new MetricsRegistry();
+ *     const metrics = Metrics.create();
  *     app.use("/viz", viz(metrics));
  *     app.listen(8080);
  *
  * You can place it at any path you want.
  */
-export function viz(registry: MetricsRegistry, options: VizOptions = {}): express.Router {
+export function viz(metrics: Metrics, options: VizOptions = {}): express.Router {
   const router = express.Router();
   router.use("/", express.static(staticPath));
 
   const ringBuffer = new RingBuffer(options);
-  registry.events.map(deltaSnapshots()).attach(ringBuffer);
+  metrics.events.map(deltaSnapshots()).attach(ringBuffer);
 
   router.get("/history.json", (request, response) => {
     const records = ringBuffer.get();
@@ -78,18 +78,19 @@ export function viz(registry: MetricsRegistry, options: VizOptions = {}): expres
  * If you don't have any other use for a web server, you can use this to
  * do the whole creation:
  *
- *     import { MetricsRegistry, startVizServer } from "crow-metrics";
+ *     import { Metrics } from "crow-metrics";
+ *     import { startVizServer } from "crow-metrics-viz"
  *     import express from "express";
  *
- *     var metrics = new MetricsRegistry();
- *     startVizServer(express, metrics);
+ *     var metrics = Metrics.create();
+ *     startVizServer(metrics, 8080);
  */
 export function startVizServer(
-  registry: MetricsRegistry,
+  metrics: Metrics,
   port: number = 8080,
   options: VizOptions = {}
 ) {
   const app = express();
-  app.use("/", viz(registry, options));
+  app.use("/", viz(metrics, options));
   app.listen(port);
 }

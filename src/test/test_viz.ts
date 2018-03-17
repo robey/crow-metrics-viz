@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as http from "http";
-import { Metrics, MetricsRegistry } from "crow-metrics";
+import { Metrics } from "crow-metrics";
 import { viz } from "../viz";
 import * as request from "supertest-as-promised";
 
@@ -8,27 +8,25 @@ import "should";
 import "source-map-support/register";
 
 describe("viz", () => {
-  let r: MetricsRegistry;
   let m: Metrics;
 
   beforeEach(() => {
-    r = new MetricsRegistry();
-    m = r.metrics;
+    m = Metrics.create();
   });
 
   afterEach(() => {
-    r.stop();
+    m.registry.stop();
   });
 
   it("reports current values", () => {
     const app = express();
-    const router = viz(r);
+    const router = viz(m);
     app.use(router);
 
     m.setGauge(m.gauge("speed"), 45);
     m.increment(m.counter("bugs"), 23);
     m.addDistribution(m.distribution("tears"), 10);
-    r.publish();
+    m.registry.publish();
 
     return request(app).get("/current.json").expect(200).then(response => {
       response.body.should.eql({
@@ -45,18 +43,18 @@ describe("viz", () => {
 
   it("reports history", () => {
     const app = express();
-    const router = viz(r);
+    const router = viz(m);
     app.use(router);
 
     m.setGauge(m.gauge("speed"), 45);
     m.increment(m.counter("bugs"), 23);
     m.addDistribution(m.distribution("tears"), 10);
-    r.publish();
+    m.registry.publish();
 
     m.increment(m.counter("bugs"), 5);
     m.increment(m.counter("foo"), 10);
     m.addDistribution(m.distribution("tears"), 3);
-    r.publish();
+    m.registry.publish();
 
     return request(app).get("/history.json").expect(200).then(response => {
       const history = response.body;
@@ -73,13 +71,13 @@ describe("viz", () => {
 
   it("reports debugging info", () => {
     const app = express();
-    const router = viz(r);
+    const router = viz(m);
     app.use(router);
 
     m.increment(m.counter("bugs"), 23);
-    r.publish();
+    m.registry.publish();
     m.increment(m.counter("bugs"), 5);
-    r.publish();
+    m.registry.publish();
 
     return request(app).get("/debug.json").expect(200).then(response => {
       const debug = response.body;
