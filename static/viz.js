@@ -12,7 +12,6 @@ async function refresh() {
     if (points.length == 1) points.push([ points[0][0] + 1, points[0][1] ]);
 
     const graphDiv = document.getElementById("graph-template").cloneNode(true);
-    graphsDiv.appendChild(graphDiv);
     const setText = (name, text) => graphDiv.getElementsByClassName(name)[0].textContent = text;
     graphDiv.id = `graph-${name}`;
     setText("name", name);
@@ -22,6 +21,7 @@ async function refresh() {
       setText("value", points[points.length - 1][1].toString().slice(0, 11));
       drawSvg(graphDiv.getElementsByTagName("svg")[0], points);
     }
+    graphsDiv.appendChild(graphDiv);
   }
 
   document.getElementById("current-time").textContent = new Date().toISOString();
@@ -29,13 +29,13 @@ async function refresh() {
 
 function drawSvg(svg, points) {
   const xOffset = 0.5, yOffset = 0, width = svg.width.baseVal.value - xOffset * 2, height = svg.height.baseVal.value;
-  const pointsToSvg = points => points.map(p => `${p[0]} ${p[1]}`).join(", ");
+  const pointsToSvg = points => points.map(([ x, y ]) => `${x} ${y}`).join(", ");
 
   const xmin = points[0][0], xmax = points[points.length - 1][0];
-  const ymax = Math.max(...points.map(p => p[1]));
-  const scaledPoints = points.map(p => [
-    xOffset + width * (p[0] - xmin) / (xmax - xmin),
-    (yOffset + height) - height * p[1] / ymax
+  const ymax = Math.max(...points.map(([ x, y ]) => y));
+  const scaledPoints = points.map(([ x, y ]) => [
+    xOffset + width * (x - xmin) / (xmax - xmin),
+    (yOffset + height) - height * y / ymax
   ]);
   const polyPoints = [ [ xOffset, yOffset + height ], ...scaledPoints, [ xOffset + width, yOffset + height ] ];
 
