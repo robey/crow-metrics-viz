@@ -1,36 +1,49 @@
+async function refresh() {
+  const response = await fetch("history.json");
+  const history = response.ok ? await response.json() : {};
+  const names = Object.keys(history).filter(name => name[0] != "@").sort();
 
-function refresh() {
-  $.getJSON("history.json", function (data) {
-    // "@timestamp": [ t, t, t, ... ]
-    // "metric_name": [ y, y, y, ... ]
+  const graphsDiv = document.getElementById("graphs");
+  while (graphsDiv.firstChild) graphsDiv.removeChild(graphsDiv.firstChild);
 
-    var names = Object.keys(data).filter(function (name) { return name[0] != "@"; }).sort();
+  for (const name of names) {
+    const points = history[name].map((v, i) => v == null ? null : [ i, v ]).filter(p => p != null);
+    // draw a straight line when we have exactly one data point:
+    if (points.length == 1) points.push([ points[0][0] + 1, points[0][1] ]);
 
-    var graphsDiv = $(".graphs");
-    graphsDiv.empty();
-    $.each(names, function (i, name) {
-      var currentValue = data[name][data[name].length - 1];
-      if (currentValue) {
-        currentValue = currentValue.toString().substring(0, 11);
-      } else {
-        currentValue = "(none)";
-      }
-      var values = data[name].map(function (value) { return value == null ? 0 : value; });
-      var graphDiv = $(".graph-template").clone();
-      graphDiv.removeClass("graph-template");
-      graphDiv.addClass("graph");
-      graphDiv.children(".peity").remove();
-      graphDiv.children(".line").first().text(values.join(","));
-      graphDiv.children(".value").first().text(currentValue);
-      graphDiv.children(".name").first().text(name);
-      graphsDiv.append(graphDiv);
-    });
+    const graphDiv = document.getElementById("graph-template").cloneNode(true);
+    graphsDiv.appendChild(graphDiv);
+    const setText = (name, text) => graphDiv.getElementsByClassName(name)[0].textContent = text;
+    graphDiv.id = `graph-${name}`;
+    setText("name", name);
+    if (points.length == 0) {
+      setText("value", "(none)");
+    } else {
+      setText("value", points[points.length - 1][1].toString().slice(0, 11));
+      drawSvg(graphDiv.getElementsByTagName("svg")[0], points);
+    }
+  }
 
-    $(".line").peity("line", { fill: "orange", stroke: "red", width: "128px", height: "24px" });
-    $(".current-time").text(new Date().toString());
-
-    setTimeout(refresh, 5000);
-  });
+  document.getElementById("current-time").textContent = new Date().toISOString();
 }
 
-setTimeout(refresh, 0);
+function drawSvg(svg, points) {
+  const xOffset = 0.5, yOffset = 0, width = svg.width.baseVal.value - xOffset * 2, height = svg.height.baseVal.value;
+  const pointsToSvg = points => points.map(p => `${p[0]} ${p[1]}`).join(", ");
+
+  const xmin = points[0][0], xmax = points[points.length - 1][0];
+  const ymax = Math.max(...points.map(p => p[1]));
+  const scaledPoints = points.map(p => [
+    xOffset + width * (p[0] - xmin) / (xmax - xmin),
+    (yOffset + height) - height * p[1] / ymax
+  ]);
+  const polyPoints = [ [ xOffset, yOffset + height ], ...scaledPoints, [ xOffset + width, yOffset + height ] ];
+
+  const polyline = svg.getElementsByTagName("polyline")[0];
+  polyline.setAttribute("points", pointsToSvg(scaledPoints));
+  const polygon = svg.getElementsByTagName("polygon")[0];
+  polygon.setAttribute("points", pointsToSvg(polyPoints));
+}
+
+setInterval(refresh, 5000);
+refresh();

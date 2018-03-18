@@ -1,21 +1,25 @@
 <html>
   <head>
     <title> crow metrics </title>
-    <script src="jquery-3.0.0.min.js"></script>
-    <script src="jquery.peity.min.js"></script>
     <script src="viz.js"></script>
     <link rel="stylesheet" type="text/css" href="viz.css">
   </head>
   <body>
-    <div class="right">
-      <div class="current-time"></div>
-      <img src="crow.png">
+    <div id="current-time"></div>
+    <div id="main">
+      <div id="graphs"></div>
+      <div class="bird">
+        <img src="crow.png">
+      </div>
     </div>
-    <div class="graphs"></div>
-    <div class="graph-template">
-      <span class="line">0</span>
-      <span class="value">0</span>
-      <span class="name">no</span>
+
+    <div class="graph" id="graph-template">
+      <svg width="128px" height="24px">
+        <polygon fill="orange" points=""></polygon>
+        <polyline fill="transparent" points="" stroke="red" stroke-width="1" stroke-linecap="square"></polyline>
+      </svg>
+      <span class="value"></span>
+      <span class="name"></span>
     </div>
   </body>
 </html>
