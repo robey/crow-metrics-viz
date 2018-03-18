@@ -5,7 +5,11 @@
     <link rel="stylesheet" type="text/css" href="viz.css">
   </head>
   <body>
-    <div id="current-time"></div>
+    <div id="links">
+      <a href="history.json">[history.json]</a>
+      <a href="current.json">[current.json]</a>
+      <div id="current-time"></div>
+    </div>
     <div id="main">
       <div id="graphs"></div>
       <div class="bird">
@@ -14,12 +18,13 @@
     </div>
 
     <div class="graph" id="graph-template">
-      <svg width="128px" height="24px">
+      <svg class="svg" width="128px" height="24px">
         <polygon fill="orange" points=""></polygon>
         <polyline fill="transparent" points="" stroke="red" stroke-width="1" stroke-linecap="square"></polyline>
       </svg>
       <span class="value"></span>
       <span class="name"></span>
+      <span class="details"></span>
     </div>
   </body>
 </html>

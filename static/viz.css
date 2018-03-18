@@ -6,9 +6,23 @@ body {
   margin: 2em;
 }
 
-#current-time {
+#links {
+  display: flex;
   font: bold 14px monospace;
   color: #a00;
+  padding-bottom: 1em;
+}
+
+#links a {
+  flex: initial;
+  margin-left: 1em;
+}
+#links a:link {
+  text-decoration: none;
+}
+
+#current-time {
+  flex: auto;
   text-align: right;
 }
 
@@ -37,8 +51,13 @@ body {
 .graph {
   display: flex;
   flex-direction: row;
-  padding-bottom: 6px;
+  padding: 3px 0px 3px 0px;
   height: 24px;
+  cursor: pointer;
+}
+
+.graph:hover {
+  background: #fef;
 }
 
 .graph .value {
@@ -54,6 +73,11 @@ body {
   line-height: 24px;
   padding-left: 1em;
   color: #a66;
+}
+
+.graph .details {
+  font: 10px monospace;
+  margin-left: 2em;
 }
 
 #graph-template {
