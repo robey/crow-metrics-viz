@@ -51,6 +51,11 @@ export function viz(metrics: Metrics, options: VizOptions = {}): express.Router 
   return router;
 }
 
+/*
+ * Return the ring buffer history as an object, where each key is one metric,
+ * and each value is the array of data points for that metric. A special
+ * `@timestamp` key holds the array of timestamps covered.
+ */
 function getJsonHistory(ringBuffer: RingBuffer): HistoryJson {
   const snapshots = ringBuffer.get();
   const names = Array.from(new Set<string>(flatten(snapshots.map(s => s.flatten().keys())))).sort();
