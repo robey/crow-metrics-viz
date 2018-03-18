@@ -34,18 +34,18 @@ export function viz(metrics: Metrics, options: VizOptions = {}): express.Router 
 
   router.get("/history.json", (request, response) => {
     response.type("json");
-    response.send(getJsonHistory(ringBuffer));
+    response.send(JSON.stringify(getJsonHistory(ringBuffer), null, 2));
   });
 
   router.get("/debug.json", (request, response) => {
     response.type("json");
-    response.send(ringBuffer.get().map(s => s.toJson()));
+    response.send(JSON.stringify(ringBuffer.get().map(s => s.toJson()), null, 2));
   });
 
   router.get("/current.json", (request, response) => {
     const latest = ringBuffer.getLatest();
     response.type("json");
-    response.send(latest ? latest.toJson() : {});
+    response.send(JSON.stringify(latest ? latest.toJson() : {}, null, 2));
   });
 
   return router;
