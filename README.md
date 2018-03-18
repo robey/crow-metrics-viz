@@ -17,6 +17,7 @@ There are two ways to construct the service:
     - `metrics` - a crow `Metrics` object
     - `options` - passed to the `RingBuffer`:
         - `span: number` - how many milliseconds to buffer (default is one hour, or 3600 * 1000)
+        - `prometheus: boolean` - if true, a prometheus document will be hosted at `/metrics`
 
   For example:
 
@@ -62,6 +63,10 @@ There are two ways to construct the service:
 - `/history.json`
 
   A JSON object where each key is the name of a metric, and each value is an array of the metric's values over the past hour (or whatever span you configured), in order from oldest to newest. A special key `"@timestamp"` gives an array of the corresponding timestamps for these values, in epoch seconds.
+
+- `/metrics`
+
+  A prometheus-formatted plaintext metrics snapshot, if requested in `options`.
 
 
 ## License

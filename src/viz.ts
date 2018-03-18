@@ -1,5 +1,5 @@
 import * as path from "path";
-import { deltaSnapshots, Metrics, RingBuffer, RingBufferOptions } from "crow-metrics";
+import { deltaSnapshots, exportPrometheus, Metrics, RingBuffer, RingBufferOptions } from "crow-metrics";
 import * as express from "express";
 
 // find our static folder -> ./lib/crow/viz/viz.js -> ./static
@@ -8,7 +8,10 @@ const staticPath = path.resolve(require.resolve(".."), "../../static");
 type HistoryJson = { [key: string]: (number | null)[] };
 
 // no extra options yet.
-export interface VizOptions extends RingBufferOptions {}
+export interface VizOptions extends RingBufferOptions {
+  // add a `/metrics` path for exporting to prometheus?
+  prometheus?: boolean;
+}
 
 /*
  * Create a sub-path on your existing web server for displaying per-server
@@ -47,6 +50,18 @@ export function viz(metrics: Metrics, options: VizOptions = {}): express.Router 
     response.type("json");
     response.send(JSON.stringify(latest ? latest.toJson() : {}, null, 2));
   });
+
+  if (options.prometheus) {
+    let lastDocument: string = "";
+    metrics.events.map(exportPrometheus).forEach(document => {
+      lastDocument = document;
+    });
+
+    router.get("/metrics", (request, response) => {
+      response.set("Content-Type", "text/plain; version=0.0.4");
+      response.send(lastDocument);
+    });
+  }
 
   return router;
 }
