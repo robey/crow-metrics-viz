@@ -1,7 +1,5 @@
 # crow-metrics-viz
 
-<img src="docs/crow-small.png" align="right">
-
 Viz is a small plugin for [crow-metrics](https://github.com/robey/crow-metrics) that exposes your server's metrics over HTTP using [express](https://expressjs.com/). It collects snapshots over a rolling window (one hour, by default) and graphs this data on a web page.
 
 <img src="docs/crow-screenshot.png">
