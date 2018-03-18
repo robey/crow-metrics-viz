@@ -30,6 +30,8 @@ There are two ways to construct the service:
   app.use("/admin/viz", viz(express, metrics));
   ```
 
+  This will add the viz paths under `/admin/viz` on your express server.
+
 - `startVizServer(metrics: Metrics, port: number = 8080, options: VizOptions = {})`
 
   Start up the viz site on a devoted port with a new instance of express.
@@ -45,6 +47,21 @@ There are two ways to construct the service:
   ```
 
   This will create a page at `http://localhost:9090/`.
+
+
+## Paths
+
+- `/`
+
+  A small webpage that loads the content from `/history.json` and draws an SVG graph for each one. This is meant to give a quick human-readable overview of the server instance's metrics.
+
+- `/current.json`
+
+  A JSON object where each key is the name of a metric, and each value is its current value.
+
+- `/history.json`
+
+  A JSON object where each key is the name of a metric, and each value is an array of the metric's values over the past hour (or whatever span you configured), in order from oldest to newest. A special key `"@timestamp"` gives an array of the corresponding timestamps for these values, in epoch seconds.
 
 
 ## License
