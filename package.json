@@ -39,7 +39,7 @@
     "node": ">=8.5.0"
   },
   "main": "./lib/viz",
-  "types": "./lib/vis.d.ts",
+  "types": "./lib/viz.d.ts",
   "files": [
     "lib",
     "static"
