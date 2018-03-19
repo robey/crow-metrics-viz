@@ -1,6 +1,6 @@
 {
   "name": "crow-metrics-viz",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "express plugin that exports and displays crow metrics",
   "keywords": [
     "metrics",
