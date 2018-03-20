@@ -6,6 +6,10 @@ body {
   margin: 2em;
 }
 
+.error {
+  background: #fcc;
+}
+
 #links {
   display: flex;
   font: bold 14px monospace;
